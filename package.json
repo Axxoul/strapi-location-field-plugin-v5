@@ -1,5 +1,5 @@
 {
-  "name": "strapi-location-field-plugin",
+  "name": "strapi-location-field-plugin-new",
   "version": "1.2.2",
   "description": "A plugin to add a location field to Strapi",
   "strapi": {
@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/raykeating/strapi-location-field-plugin.git"
+    "url": "https://github.com/KindCoder-no/strapi-location-field-plugin-new.git"
   },
   "dependencies": {
     "@googlemaps/js-api-loader": "^1.15.1"
@@ -32,5 +32,5 @@
     "npm": ">=6.0.0"
   },
   "license": "MIT",
-  "homepage": "https://github.com/raykeating/strapi-location-field-plugin#readme"
+  "homepage": "https://github.com/KindCoder-no/strapi-location-field-plugin-new#readme"
 }
