@@ -16,7 +16,7 @@
     "@googlemaps/js-api-loader": "^1.15.1"
   },
   "peerDependencies": {
-    "@strapi/strapi": "^4.0.0"
+    "@strapi/strapi": "^5.0.0"
   },
   "author": {
     "name": "Ray Keating",
