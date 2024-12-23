@@ -3,7 +3,7 @@
  */
 
 import axios from 'axios';
-import { auth, wrapAxiosInstance } from '@strapi/helper-plugin';
+// import { auth, wrapAxiosInstance } from '@strapi/helper-plugin';
 
 const instance = axios.create({
   baseURL: process.env.STRAPI_ADMIN_BACKEND_URL,
@@ -12,7 +12,7 @@ const instance = axios.create({
 instance.interceptors.request.use(
   async (config) => {
     config.headers = {
-      Authorization: `Bearer ${auth.getToken()}`,
+      // Authorization: `Bearer ${auth.getToken()}`,
       Accept: 'application/json',
       'Content-Type': 'application/json',
     };
@@ -29,7 +29,7 @@ instance.interceptors.response.use(
   (error) => {
     // whatever you want to do with the error
     if (error.response?.status === 401) {
-      auth.clearAppStorage();
+      window.localStorage.clear();
       window.location.reload();
     }
 
@@ -37,6 +37,8 @@ instance.interceptors.response.use(
   }
 );
 
-const wrapper = wrapAxiosInstance(instance);
+// const wrapper = wrapAxiosInstance(instance);
 
-export default wrapper;
+// export default wrapper;
+
+export default instance;
