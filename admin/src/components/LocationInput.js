@@ -1,10 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Loader } from "@googlemaps/js-api-loader";
-
-import { NumberInput, Box } from "@strapi/design-system";
-import { Combobox } from "@strapi/design-system";
-import { ComboboxOption } from "@strapi/design-system";
-import { request } from "@strapi/helper-plugin";
+import { NumberInput, Box, Combobox, ComboboxOption } from "@strapi/design-system";
 
 export default function Input({
   onChange,
@@ -18,34 +14,33 @@ export default function Input({
   const [apiKey, setApiKey] = useState(null);
   const [fields, setFields] = useState(null);
   const [loader, setLoader] = useState(null);
-  const [autocompletionRequestOptions, setAutocompletionRequestOptions] =
-    useState(null);
+  const [autocompletionRequestOptions, setAutocompletionRequestOptions] = useState(null);
   const [textValue, setTextValue] = useState(
-    "" || (value !== "null" ? JSON.parse(value).description : "")
+    value && value !== "null" ? JSON.parse(value).description : ""
   );
-
   const [predictions, setPredictions] = useState([]);
 
-  // Fetch config details
-  React.useEffect(() => {
-    const fetchConfig = async () => {
-      const { signal } = new AbortController();
-      const { fields, autocompletionRequestOptions, googleMapsApiKey } =
-        await request("/location-field/config", {
-          method: "GET",
-          signal,
-        });
+  const fetchConfig = async (signal) => {
+    const response = await fetch("/location-field/config", { method: "GET", signal });
+    if (!response.ok) throw new Error("Failed to fetch configuration");
+    const config = await response.json();
+    return config;
+  };
 
-      setApiKey(googleMapsApiKey);
-      setFields(fields?.includes("geometry") ? fields : [...(fields || []), "geometry"]);
-      setAutocompletionRequestOptions(autocompletionRequestOptions);
-    };
+  useEffect(() => {
+    const abortController = new AbortController();
+    fetchConfig(abortController.signal)
+      .then(({ googleMapsApiKey, fields, autocompletionRequestOptions }) => {
+        setApiKey(googleMapsApiKey);
+        setFields(fields.includes("geometry") ? fields : [...fields, "geometry"]);
+        setAutocompletionRequestOptions(autocompletionRequestOptions);
+      })
+      .catch((err) => console.error(err));
 
-    fetchConfig();
+    return () => abortController.abort();
   }, []);
 
-  // Initialize Google Maps Loader
-  React.useEffect(() => {
+  useEffect(() => {
     if (apiKey) {
       const loaderInstance = new Loader({
         apiKey,
@@ -57,54 +52,54 @@ export default function Input({
   }, [apiKey]);
 
   const handleInputChange = (e) => {
-    setTextValue(e.target.value);
+    const inputValue = e.target.value;
+    setTextValue(inputValue);
 
-    if (!e.target.value) {
+    if (!inputValue) {
       setPredictions([]);
-      setLocationValue("");
+      setLocationValue(null);
       return;
     }
 
     loader.load().then((google) => {
       const service = new google.maps.places.AutocompleteService();
       service.getPlacePredictions(
-        { input: e.target.value, ...autocompletionRequestOptions },
-        (predictions, status) => {
+        { input: inputValue, ...autocompletionRequestOptions },
+        (results, status) => {
           if (status === google.maps.places.PlacesServiceStatus.OK) {
-            setPredictions(predictions || []);
+            setPredictions(results || []);
           }
         }
       );
     });
   };
 
-  const setLocationValue = (val) => {
-    if (!val) {
+  const setLocationValue = (placeId) => {
+    if (!placeId) {
       setTextValue("");
       onChange({ target: { name, value: null, type: attribute.type } });
       return;
     }
 
-    const selectedPrediction = predictions.find(
-      (prediction) => prediction.place_id === val
-    );
+    const selectedPrediction = predictions.find((pred) => pred.place_id === placeId);
 
     if (selectedPrediction) {
       setTextValue(selectedPrediction.description);
+
       loader.load().then((google) => {
         const service = new google.maps.places.PlacesService(document.createElement("div"));
         service.getDetails(
           { placeId: selectedPrediction.place_id, fields },
           (place, status) => {
             if (status === google.maps.places.PlacesServiceStatus.OK) {
-              const valueToSave = JSON.stringify({
+              const locationData = JSON.stringify({
                 description: selectedPrediction.description,
                 place_id: selectedPrediction.place_id,
                 lat: place.geometry.location.lat(),
                 lng: place.geometry.location.lng(),
               });
 
-              onChange({ target: { name, value: valueToSave, type: attribute.type } });
+              onChange({ target: { name, value: locationData, type: attribute.type } });
             }
           }
         );
@@ -112,17 +107,10 @@ export default function Input({
     }
   };
 
-  const setCoordinates = (val, type) => {
-    const parsedValue = value !== "null" ? JSON.parse(value) : {};
-    const updatedValue = { ...parsedValue, [type]: val || null };
-
-    onChange({
-      target: {
-        name,
-        value: JSON.stringify(updatedValue),
-        type: attribute.type,
-      },
-    });
+  const setCoordinates = (coordinate, type) => {
+    const currentValue = value && value !== "null" ? JSON.parse(value) : {};
+    const updatedValue = { ...currentValue, [type]: coordinate || null };
+    onChange({ target: { name, value: JSON.stringify(updatedValue), type: attribute.type } });
   };
 
   return (
@@ -138,9 +126,9 @@ export default function Input({
             placeholder="Ex. 123 Street, Niagara Falls, ON"
             onChange={setLocationValue}
             onInputChange={handleInputChange}
-            value={value !== "null" && value ? JSON.parse(value).place_id : ""}
+            value={value && value !== "null" ? JSON.parse(value).place_id : ""}
             textValue={textValue}
-            onClear={() => setLocationValue("")}
+            onClear={() => setLocationValue(null)}
           >
             {predictions.map((prediction) => (
               <ComboboxOption key={prediction.place_id} value={prediction.place_id}>
@@ -151,23 +139,23 @@ export default function Input({
         )}
       </Box>
 
-      {value !== "null" && JSON.parse(value).place_id === "custom_location" && (
+      {value && JSON.parse(value).place_id === "custom_location" && (
         <Box display="flex" gap={2}>
           <NumberInput
             label="Latitude"
             name="latitude"
             placeholder="Ex. 43.123456"
             disabled={disabled}
-            onValueChange={(e) => setCoordinates(e, "lat")}
-            value={value !== "null" ? JSON.parse(value).lat : ""}
+            onValueChange={(val) => setCoordinates(val, "lat")}
+            value={value && value !== "null" ? JSON.parse(value).lat : ""}
           />
           <NumberInput
             label="Longitude"
             name="longitude"
             placeholder="Ex. -79.123456"
             disabled={disabled}
-            onValueChange={(e) => setCoordinates(e, "lng")}
-            value={value !== "null" ? JSON.parse(value).lng : ""}
+            onValueChange={(val) => setCoordinates(val, "lng")}
+            value={value && value !== "null" ? JSON.parse(value).lng : ""}
           />
         </Box>
       )}
