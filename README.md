@@ -90,7 +90,4 @@ module.exports = [
 After installation and configuration, build the project with `npm run build` or `yarn build`
 
 
-### Additional Information
-- This plugin is not affiliated with Google in any way.
 
-To support, go to [https://www.buymeacoffee.com/raykeating](https://www.buymeacoffee.com/raykeating) 💜

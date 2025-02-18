@@ -1,6 +1,6 @@
 {
-  "name": "strapi-location-field-plugin-new",
-  "version": "5.1.8",
+  "name": "strapi-location-field-plugin-fixed",
+  "version": "5.1.9",
   "description": "A plugin to add a location field to Strapi",
   "strapi": {
     "name": "location-field",
@@ -22,12 +22,11 @@
     "@strapi/strapi": "^5.0.0"
   },
   "author": {
-    "name": "Ray Keating",
-    "email": "raykeating13@gmail.com"
+    "name": "Fabian Marquez"
   },
   "maintainers": [
     {
-      "name": "Ray Keating"
+      "name": "Fabian Marquez"
     }
   ],
   "engines": {
@@ -35,5 +34,5 @@
     "npm": ">=6.0.0"
   },
   "license": "MIT",
-  "homepage": "https://github.com/KindCoder-no/strapi-location-field-plugin-new#readme"
+  "homepage": "https://github.com/FabianMHz15/strapi-location-field-plugin-new#readme"
 }
