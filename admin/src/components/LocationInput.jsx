@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Loader } from "@googlemaps/js-api-loader";
 
-import { NumberInput, Flex, Box, Label } from "@strapi/design-system";
+import { NumberInput, Flex, Box, FieldLabel } from "@strapi/design-system";
 
 import { Combobox } from "@strapi/design-system";
 import { ComboboxOption } from "@strapi/design-system";
@@ -223,7 +223,7 @@ export default function Input({
 
 	return (
 		<Flex direction="column" alignItems="start" gap={3}>
-			<Label htmlFor="location">Ubicación</Label>
+			<FieldLabel htmlFor="location">Ubicación</FieldLabel>
 			<Box width="100%">
 				{loader && apiKey && fields && (
 					<Combobox
@@ -288,7 +288,7 @@ export default function Input({
 			</Box>
 			{value !== "null" && safeJsonParse(value)?.place_id === "custom_location" && (
 				<Flex gap={2}>
-					<Label htmlFor="latitude">Latitud</Label>
+					<FieldLabel htmlFor="latitude">Latitud</FieldLabel>
 					<NumberInput
 						label="Latitude"
 						name="latitude"
@@ -297,7 +297,7 @@ export default function Input({
 						onValueChange={(e) => setCoordinates(e, "lat")}
 						value={value !== "null" ? safeJsonParse(value)?.lat : null}
 					/>
-					<Label htmlFor="longitude">Longitud</Label>
+					<FieldLabel htmlFor="longitude">Longitud</FieldLabel>
 					<NumberInput
 						label="Longitude"
 						name="longitude"
