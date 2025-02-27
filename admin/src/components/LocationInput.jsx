@@ -224,8 +224,8 @@ export default function Input({
 
 	return (
 		<Flex direction="column" alignItems="start" gap={3}>
-			<Field name="custom-combobox" label={label}>
 			<Box width="100%">
+			<Field name="custom-combobox" label={label}>
 				{loader && apiKey && fields && (
 					<Combobox
 						label="Location"
@@ -286,8 +286,8 @@ export default function Input({
 							])}
 					</Combobox>
 				)}
-			</Box>
 			</Field>
+			</Box>
 			{value !== "null" && safeJsonParse(value)?.place_id === "custom_location" && (
 				<Flex gap={2}>
 					<Field name="latitude" label="Latitud">
