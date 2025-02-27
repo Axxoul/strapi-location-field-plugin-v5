@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { Loader } from "@googlemaps/js-api-loader";
 
-import { NumberInput, Flex, Box, Field } from "@strapi/design-system";
+import { NumberInput, Flex, Box, Field } from "@strapi/design-system/components";
 
-import { Combobox } from "@strapi/design-system";
-import { ComboboxOption } from "@strapi/design-system";
+import { Combobox } from "@strapi/design-system/Combobox";
+import { ComboboxOption } from "@strapi/design-system/ComboboxOption";
 
 import { useFetchClient } from "@strapi/strapi/admin";
 
