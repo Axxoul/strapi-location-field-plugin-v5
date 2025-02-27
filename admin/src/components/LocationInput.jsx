@@ -264,25 +264,25 @@ export default function Input({
 							// the following lines are required to add the "custom location" options
 							// without it, the combobox breaks
 							.concat([
-								<div
+								<ComboboxOption
 									key="custom_location"
 									value="custom_location"
-									style={{ display: "none" }}
+									
 								>
 									{value !== "null" &&
 									safeJsonParse(value)?.place_id === "custom_location"
 										? safeJsonParse(value)?.description
 										: "Custom Location"}
-								</div>,
+								</ComboboxOption>,
 							])
 							.concat([
-								<div
+								<ComboboxOption
 									key="selected"
 									value={value !== "null" ? safeJsonParse(value)?.place_id : ""}
-									style={{ display: "none" }}
+									
 								>
 									{value !== "null" ? safeJsonParse(value)?.description : ""}
-								</div>,
+								</ComboboxOption>,
 							])}
 					</Combobox>
 				)}
