@@ -18,7 +18,6 @@ export default function Input({
 	attribute,
 	error,
 	required,
-	label,
 }) {
 	const [apiKey, setApiKey] = useState(null);
 	const [fields, setFields] = useState(null);
@@ -225,7 +224,7 @@ export default function Input({
 	return (
 		<Flex direction="column" alignItems="start" gap={3}>
 			<Box width="100%">
-			<Field name="custom-combobox" label={label}>
+			<Field name="custom-combobox" label="Ubicación">
 				{loader && apiKey && fields && (
 					<Combobox
 						label="Location"
