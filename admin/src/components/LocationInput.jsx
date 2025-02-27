@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import { Loader } from "@googlemaps/js-api-loader";
 
-import { NumberInput, Flex, Box, Field } from "@strapi/design-system/components";
+import { NumberInput, Flex, Box, Field } from "@strapi/design-system";
 
-import { Combobox } from "@strapi/design-system/Combobox";
-import { ComboboxOption } from "@strapi/design-system/ComboboxOption";
+import { Combobox, ComboboxOption } from "@strapi/design-system";
 
 import { useFetchClient } from "@strapi/strapi/admin";
 
@@ -224,7 +223,10 @@ export default function Input({
 	return (
 		<Flex direction="column" alignItems="start" gap={3}>
 			<Box width="100%">
-			<Field name="custom-combobox" label="Ubicación">
+				<Field.Root>
+					<Field.Label>Ubicación</Field.Label>
+				
+			
 				{loader && apiKey && fields && (
 					<Combobox
 						label="Location"
@@ -263,7 +265,7 @@ export default function Input({
 							// the following lines are required to add the "custom location" options
 							// without it, the combobox breaks
 							.concat([
-								<ComboboxOption
+								<div
 									key="custom_location"
 									value="custom_location"
 									
@@ -272,24 +274,25 @@ export default function Input({
 									safeJsonParse(value)?.place_id === "custom_location"
 										? safeJsonParse(value)?.description
 										: "Custom Location"}
-								</ComboboxOption>,
+								</div>,
 							])
 							.concat([
-								<ComboboxOption
+								<div
 									key="selected"
 									value={value !== "null" ? safeJsonParse(value)?.place_id : ""}
 									
 								>
 									{value !== "null" ? safeJsonParse(value)?.description : ""}
-								</ComboboxOption>,
+								</div>,
 							])}
 					</Combobox>
 				)}
-			</Field>
+			</Field.Root>
 			</Box>
 			{value !== "null" && safeJsonParse(value)?.place_id === "custom_location" && (
 				<Flex gap={2}>
-					<Field name="latitude" label="Latitud">
+					<Field.Root>
+					<Field.Label>Latitud</Field.Label>
 					<NumberInput
 						label="Latitude"
 						name="latitude"
@@ -298,8 +301,9 @@ export default function Input({
 						onValueChange={(e) => setCoordinates(e, "lat")}
 						value={value !== "null" ? safeJsonParse(value)?.lat : null}
 					/>
-					</Field>
-					<Field name="longitude" label="Longitud">
+					</Field.Root>
+					<Field.Root>
+					<Field.Label>Longitud</Field.Label>
 					<NumberInput
 						label="Longitude"
 						name="longitude"
@@ -308,7 +312,7 @@ export default function Input({
 						onValueChange={(e) => setCoordinates(e, "lng")}
 						value={value !== "null" ? safeJsonParse(value)?.lng : null}
 					/>
-					</Field>
+					</Field.Root>
 				</Flex>
 			)}
 		</Flex>
