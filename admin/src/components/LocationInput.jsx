@@ -143,6 +143,7 @@ export default function Input({
 								photo.url = photo.getUrl();
 							});
 						}
+						console.log('place', place);
 
 						selectedPrediction.details = place;
 
