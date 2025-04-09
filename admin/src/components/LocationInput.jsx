@@ -105,45 +105,77 @@ export default function Input({
 		getSuggestions();
 	};
 
+	const getPlaceDetails = async (placeId) => {
+		try {
+			const response = await fetch(
+				`https://places.googleapis.com/v1/places/${placeId}?fields=id,displayName,regularOpeningHours`,
+				{
+					headers: {
+						'X-Goog-Api-Key': apiKey,
+						'X-Goog-FieldMask': 'displayName,regularOpeningHours', // campos que quieres obtener
+					},
+				}
+			);
+			
+			if (!response.ok) {
+				throw new Error('Error al obtener los detalles del lugar');
+			}
+			
+			return await response.json();
+		} catch (error) {
+			console.error('Error:', error);
+			return null;
+		}
+	};
+
 	const setLocationValue = (val) => {
 		if (!val) {
-      setTextValue("");
-      onChange({
-        target: {
-          name,
-          value: null,
-          type: attribute.type,
-        },
-      });
-      return;
-    }
+			setTextValue("");
+			onChange({
+				target: {
+					name,
+					value: null,
+					type: attribute.type,
+				},
+			});
+			return;
+		}
 		
-		let targetValue = null; // the value that will be sent to the server and saved in the database
-
+		let targetValue = null;
 		let selectedPrediction = predictions.find(
 			(prediction) => prediction.place_id === val
 		);
-    
+		
 		if (selectedPrediction && selectedPrediction.place_id) {
-      setTextValue(selectedPrediction.description);
-			loader.load().then((google) => {
+			setTextValue(selectedPrediction.description);
+			loader.load().then(async (google) => {
 				let service = new google.maps.places.PlacesService(
 					document.createElement("div")
 				);
+				
+				// Primero obtenemos los detalles básicos
 				service.getDetails(
 					{ placeId: selectedPrediction.place_id, fields },
-					(place, status) => {
+					async (place, status) => {
 						if (status !== google.maps.places.PlacesServiceStatus.OK) {
 							console.error(status);
 							return;
 						}
+
+						// Ahora obtenemos los horarios usando la nueva API
+						const placeDetails = await getPlaceDetails(selectedPrediction.place_id);
+						console.log('Detalles del lugar con horarios:', placeDetails);
+
+						if (placeDetails) {
+							place.regularOpeningHours = placeDetails.regularOpeningHours;
+						}
+
 						// if "photo" is in the fields array, call "getUrl()" for each photo in the response
 						if (fields.includes("photo") && place?.photos) {
 							place.photos.forEach((photo) => {
 								photo.url = photo.getUrl();
 							});
 						}
-						console.log('place', place);
 
 						selectedPrediction.details = place;
 
@@ -153,7 +185,9 @@ export default function Input({
 							lat: selectedPrediction.details.geometry.location.lat(),
 							lng: selectedPrediction.details.geometry.location.lng(),
 							details: selectedPrediction.details,
+							regularOpeningHours: place.regularOpeningHours // Agregamos los horarios
 						});
+
 						onChange({
 							target: {
 								name,
