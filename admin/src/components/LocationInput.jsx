@@ -147,19 +147,15 @@ export default function Input({
 
 						selectedPrediction.details = place;
 
-						targetValue = JSON.stringify({
-							description: selectedPrediction.description,
-							place_id: selectedPrediction.place_id,
-							lat: selectedPrediction.details.geometry.location.lat(),
-							lng: selectedPrediction.details.geometry.location.lng(),
-							details: selectedPrediction.details,
-						});
+						targetValue = {
+						  description: selectedPrediction.description,
+						  place_id: selectedPrediction.place_id,
+						  lat: selectedPrediction.details.geometry.location.lat(),
+						  lng: selectedPrediction.details.geometry.location.lng(),
+						  details: selectedPrediction.details,
+						};
 						onChange({
-							target: {
-								name,
-								value: targetValue,
-								type: attribute.type,
-							},
+						  target: { name, value: targetValue, type: attribute.type },
 						});
 					}
 				);
@@ -196,11 +192,7 @@ export default function Input({
 		}
 
 		onChange({
-			target: {
-				name,
-				value: JSON.stringify(targetValue),
-				type: attribute.type,
-			},
+		  target: { name, value: targetValue, type: attribute.type },
 		});
 	};
 	function safeJsonParse(input) {
@@ -309,5 +301,5 @@ export default function Input({
 }
 
 Input.defaultProps = {
-	value: "null",
+  value: null,
 };
