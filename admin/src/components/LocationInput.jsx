@@ -25,7 +25,7 @@ export default function Input({
 	const [autocompletionRequestOptions, setAutocompletionRequestOptions] =
 		useState(null);
 	const [textValue, setTextValue] = useState(
-		"" || (value !== "null" ? JSON.parse(value).description : "")
+		"" || (value !== "null" ? value?.description : "")
 	);
 
   const { get } = useFetchClient();
@@ -118,13 +118,13 @@ export default function Input({
       });
       return;
     }
-		
+
 		let targetValue = null; // the value that will be sent to the server and saved in the database
 
 		let selectedPrediction = predictions.find(
 			(prediction) => prediction.place_id === val
 		);
-    
+
 		if (selectedPrediction && selectedPrediction.place_id) {
       setTextValue(selectedPrediction.description);
 			loader.load().then((google) => {
@@ -203,6 +203,21 @@ export default function Input({
 			},
 		});
 	};
+	function safeJsonParse(input) {
+		try {
+			// Check if the input is already an object
+			if (typeof input === 'object' && input !== null) {
+				return input; // Already parsed, return as-is
+			}
+
+			// Attempt to parse the input as JSON
+			return JSON.parse(input);
+		} catch (error) {
+			// Return null or handle parsing error
+			console.error('Failed to parse JSON:', error);
+			return null;
+		}
+	}
 
 	return (
 		<Flex direction="column" alignItems="start" gap={3}>
@@ -221,7 +236,7 @@ export default function Input({
 						onInputChange={(e) => handleInputChange(e)}
 						value={
 							value !== "null" && value
-								? JSON.parse(value).place_id
+								? safeJsonParse(value)?.place_id
 								: ""
 						}
 						textValue={textValue}
@@ -251,24 +266,24 @@ export default function Input({
 									style={{ display: "none" }}
 								>
 									{value !== "null" &&
-									JSON.parse(value).place_id === "custom_location"
-										? JSON.parse(value).description
+									safeJsonParse(value)?.place_id === "custom_location"
+										? safeJsonParse(value)?.description
 										: "Custom Location"}
 								</div>,
 							])
 							.concat([
 								<div
 									key="selected"
-									value={value !== "null" ? JSON.parse(value).place_id : ""}
+									value={value !== "null" ? safeJsonParse(value)?.place_id : ""}
 									style={{ display: "none" }}
 								>
-									{value !== "null" ? JSON.parse(value).description : ""}
+									{value !== "null" ? safeJsonParse(value)?.description : ""}
 								</div>,
 							])}
 					</Combobox>
 				)}
 			</Box>
-			{value !== "null" && JSON.parse(value).place_id === "custom_location" && (
+			{value !== "null" && safeJsonParse(value)?.place_id === "custom_location" && (
 				<Flex gap={2}>
 					<NumberInput
 						label="Latitude"
@@ -276,7 +291,7 @@ export default function Input({
 						placeholder="Ex. 43.123456"
             disabled={disabled}
 						onValueChange={(e) => setCoordinates(e, "lat")}
-						value={value !== "null" ? JSON.parse(value).lat : null}
+						value={value !== "null" ? safeJsonParse(value)?.lat : null}
 					/>
 
 					<NumberInput
@@ -285,7 +300,7 @@ export default function Input({
 						placeholder="Ex. -79.123456"
             disabled={disabled}
 						onValueChange={(e) => setCoordinates(e, "lng")}
-						value={value !== "null" ? JSON.parse(value).lng : null}
+						value={value !== "null" ? safeJsonParse(value)?.lng : null}
 					/>
 				</Flex>
 			)}
